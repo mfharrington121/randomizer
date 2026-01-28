@@ -39,12 +39,45 @@ this shows up, so make it look pretty
   .my-button:hover {
     background-color: #2196F3; /* Slightly darker blue on hover */
   }
+    body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+    }
+    #result {
+            font-size: 60px;
+            border: 2px solid black;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-width: 200px;
+            text-align: center;
+        }
+        
+    #container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 </style>
 
-<button type="button" class="my-button">
-    
-    Click Me
+<body>
+    <div id="container">
+        <p id="result">?</p>
+        <button onclick="getNumber()" id="myButton" type="button" class="my-button">Click Me</button>
+    </div>
+</body>
 
-</button>
+<script>
+    function getNumber() {
+        fetch('/get-number')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').textContent = data.number;
+            });
+    }
+</script>
+
 
 </html>
