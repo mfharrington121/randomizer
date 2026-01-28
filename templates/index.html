@@ -64,6 +64,7 @@ this shows up, so make it look pretty
 
 <body>
     <div id="container">
+        <img id="histogram" src="/static/histogram.png" alt="Histogram">
         <p id="result">?</p>
         <button onclick="getNumber()" id="myButton" type="button" class="my-button">Click Me</button>
     </div>
@@ -74,7 +75,7 @@ this shows up, so make it look pretty
         fetch('/get-number')
             .then(response => response.json())
             .then(data => {
-                document.getElementById('result').textContent = data.number;
+                document.getElementById('result').textContent = data.numbers.join(', ');
             });
     }
 </script>
