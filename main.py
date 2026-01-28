@@ -1,13 +1,30 @@
 from flask import Flask, render_template, jsonify
-import os, random, requests, json, matplotlib.pyplot as plt
+import os, random, requests, json, matplotlib, plotly
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+
 
 numbers = []
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 
 @app.route('/')
 def hello():
     return render_template('index.html')
+
+#@app.route('/histogram')
+#def histogram():
+    fig = go.Figure(data=[go.Histogram(x=numbers, nbinsx=20)])
+    fig.update_layout(
+        title='Random Numbers Distribution',
+        xaxis_title='Number',
+        yaxis_title='Frequency',
+        template='plotly_white',
+        height=500,
+        width=700
+    )
+    return fig.to_html(include_plotlyjs='cdn')
 
 @app.route('/get-number')
 def get_number():
@@ -24,23 +41,35 @@ def get_number():
         "messages": [
         {
             "role": "user",
-            "content": "What is a random number between 1 and 100? only respond with the number."
+            "content": "What is a random number between 1 and 100? Respond ONLY with the number, no other text or thinking."
         }
         ]
     })
     )
-    number = int(response.json()['choices'][0]['message']['content'])
+
+    content = response.json()['choices'][0]['message']['content']
+    number = int(''.join(filter(str.isdigit, content)))
     numbers.append(number)
+
     create_histogram()
     return jsonify({'numbers': numbers})
 
 def create_histogram():
-    plt.hist([int(number) for number in numbers], bins=range(1, 100), edgecolor='black')
-    plt.title('Histogram of "Random" Numbers')
-    plt.xlabel('Number')
-    plt.ylabel('Frequency')
-    plt.savefig('static/histogram.png')
-    plt.close()
+    print(f"Creating histogram with numbers: {numbers}")
+    try:
+        fig = go.Figure(data=[go.Histogram(x=numbers, nbinsx=20)])
+        fig.update_layout(
+            title='Random Numbers Distribution',
+            xaxis_title='Number',
+            yaxis_title='Frequency',
+            template='plotly_white',
+            height=500,
+            xaxis=dict(range=[0, 100])
+        )
+        fig.write_html('static/histogram.html')
+        print("Histogram created successfully")
+    except Exception as e:
+        print(f"Error creating histogram: {e}")
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5001))

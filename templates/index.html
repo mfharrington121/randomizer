@@ -55,27 +55,26 @@ this shows up, so make it look pretty
             text-align: center;
         }
         
-    #container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
+        #container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 </style>
 
 <body>
-    <div id="container">
-        <img id="histogram" src="/static/histogram.png" alt="Histogram">
-        <p id="result">?</p>
-        <button onclick="getNumber()" id="myButton" type="button" class="my-button">Click Me</button>
-    </div>
+    <img id="histogram" src="/static/histogram.png?v=1" alt="Histogram">
+    <button onclick="getNumber()" id="myButton" type="button" class="my-button">Click Me</button>
+    <div id="result"></div>
 </body>
 
 <script>
     function getNumber() {
         fetch('/get-number')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('result').textContent = data.numbers.join(', ');
+            .then(r => r.json())
+            .then(d => {
+                document.getElementById('result').textContent = d.number;
+                document.getElementById('histogram').src = '/static/histogram.png?v=' + Date.now();
             });
     }
 </script>
